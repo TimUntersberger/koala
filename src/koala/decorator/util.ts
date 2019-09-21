@@ -1,6 +1,6 @@
 import * as Koala from "../types";
 import Router from "koa-router";
-import { addRouteHandler, getMiddlewares, emptyMiddlewares } from "./state";
+import { addRouteHandler, getCurrentRouteHandler } from "./state";
 
 export const addRouteToKoaRouter = (route: Koala.Route, router: Router) => {
   route.handlers.forEach((h: Koala.RouteHandler) => {
@@ -12,20 +12,28 @@ export const addRouteToKoaRouter = (route: Koala.Route, router: Router) => {
   });
 };
 
-export const createHttpMethodHandler = (method: Koala.HttpMethod) => (
+export const createHttpMethodDecorator = (method: Koala.HttpMethod) => (
   path: string = "/"
+) =>
+  createMethodDecorator(value => {
+    addRouteHandler({
+      method,
+      path,
+      middlewares: getCurrentRouteHandler().middlewares,
+      handler: value
+    });
+  });
+
+export const createMethodDecorator = (
+  cb: (value: Koala.RouteHandlerCallback) => void
 ) => (
   _target: any,
   _propertyKey: string,
   descriptor: TypedPropertyDescriptor<Koala.RouteHandlerCallback>
 ) => {
   if (descriptor.value) {
-    addRouteHandler({
-      method,
-      path,
-      middlewares: getMiddlewares(),
-      handler: descriptor.value
-    });
-    emptyMiddlewares();
+    cb(descriptor.value);
   }
 };
+
+export const createClassDecorator = (cb: () => void) => (_target: any) => cb();

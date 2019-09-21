@@ -1,16 +1,11 @@
-import { Router, GET, Context } from "../koala";
-import * as DI from "../di";
-
-/**
- * Change the jwt
- */
+import { Router, GET, Context, PermitAll } from "../koala";
 
 @Router("/")
 class Index {
-  // middlewares have to be underneath the http method decorator
   @GET()
+  @PermitAll()
   home(ctx: Context): void {
-    ctx.body = DI.getMessage();
+    ctx.body = ctx.account;
     ctx.status = 200;
   }
 }

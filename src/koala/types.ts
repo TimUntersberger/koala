@@ -8,7 +8,27 @@ export type HttpMethod =
   | "PATCH"
   | "OPTIONS";
 
-export type Context = KoaContext;
+export type AccessTokenPayload<TId = number, TRole = string> = {
+  id: TId;
+  role: TRole;
+};
+
+export type RefreshTokenPayload<TId = number> = {
+  id: TId;
+  version: number;
+};
+
+export type Context<TId = number, TAccount = any> = KoaContext & {
+  accessToken?: {
+    payload: AccessTokenPayload<TId>;
+    raw: string;
+  };
+  refreshToken?: {
+    payload: RefreshTokenPayload<TId>;
+    raw: string;
+  };
+  account?: TAccount;
+};
 
 export type RouteHandlerCallback = (context: Context) => void;
 

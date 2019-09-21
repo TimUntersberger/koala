@@ -1,3 +1,4 @@
+import "./di";
 import "./route/index";
 import Koa from "koa";
 import * as Koala from "./koala";
